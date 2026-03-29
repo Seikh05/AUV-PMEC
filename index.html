@@ -1,0 +1,2678 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AUV Proposal — Underwater Rare Earth Mineral Prospecting ROV</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --deep: #020c18;
+            --abyss: #010810;
+            --slate: #0b1f35;
+            --steel: #0e2d4a;
+            --cyan: #00d4ff;
+            --teal: #00a896;
+            --gold: #f0a500;
+            --coral: #ff6b4a;
+            --mist: #a8c8d8;
+            --white: #e8f4f8;
+            --dim: #5a7a8a;
+            --grid: rgba(0, 212, 255, 0.05);
+            --mono: 'Space Mono', monospace;
+            --display: 'Bebas Neue', sans-serif;
+            --body: 'DM Sans', sans-serif;
+        }
+
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--deep);
+            color: var(--white);
+            font-family: var(--body);
+            font-size: 16px;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* GRID BACKGROUND */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--grid) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* NAV */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 60px;
+            background: rgba(2, 12, 24, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 212, 255, 0.12);
+        }
+
+        .nav-logo {
+            font-family: var(--display);
+            font-size: 26px;
+            letter-spacing: 4px;
+            color: var(--cyan);
+            text-decoration: none;
+        }
+
+        .nav-logo span {
+            color: var(--gold);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: var(--mist);
+            text-decoration: none;
+            text-transform: uppercase;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--cyan);
+        }
+
+        .nav-badge {
+            font-family: var(--mono);
+            font-size: 10px;
+            padding: 6px 14px;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        /* SECTIONS */
+        section {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* HERO */
+        #hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 120px 60px 80px;
+            overflow: hidden;
+        }
+
+        .hero-depth-lines {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            width: 40%;
+            pointer-events: none;
+        }
+
+        .depth-line {
+            position: absolute;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.15));
+            animation: depthPulse 4s ease-in-out infinite;
+        }
+
+        @keyframes depthPulse {
+
+            0%,
+            100% {
+                opacity: 0.3;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        .hero-eyebrow {
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 4px;
+            color: var(--teal);
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .hero-eyebrow::before {
+            content: '';
+            width: 40px;
+            height: 1px;
+            background: var(--teal);
+        }
+
+        .hero-title {
+            font-family: var(--display);
+            font-size: clamp(72px, 9vw, 130px);
+            line-height: 0.92;
+            letter-spacing: 2px;
+            color: var(--white);
+            margin-bottom: 8px;
+        }
+
+        .hero-title .accent {
+            color: var(--cyan);
+        }
+
+        .hero-title .sub {
+            font-size: 0.45em;
+            letter-spacing: 8px;
+            color: var(--mist);
+            display: block;
+            margin-top: 8px;
+        }
+
+        .hero-desc {
+            max-width: 580px;
+            margin: 32px 0 48px;
+            font-size: 17px;
+            font-weight: 300;
+            color: var(--mist);
+            line-height: 1.75;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 48px;
+            margin-bottom: 48px;
+        }
+
+        .stat-block {
+            border-left: 2px solid var(--cyan);
+            padding-left: 16px;
+        }
+
+        .stat-num {
+            font-family: var(--display);
+            font-size: 36px;
+            letter-spacing: 2px;
+            color: var(--cyan);
+            line-height: 1;
+        }
+
+        .stat-label {
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: var(--dim);
+            text-transform: uppercase;
+            margin-top: 4px;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .btn-primary {
+            padding: 14px 36px;
+            background: var(--cyan);
+            color: var(--abyss);
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            padding: 14px 36px;
+            border: 1px solid var(--dim);
+            color: var(--mist);
+            font-family: var(--mono);
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+        }
+
+        /* ROV SVG DIAGRAM */
+        .hero-rov-container {
+            position: absolute;
+            right: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 480px;
+            height: 420px;
+            opacity: 0.9;
+        }
+
+        .rov-glow {
+            animation: rovFloat 6s ease-in-out infinite;
+        }
+
+        @keyframes rovFloat {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-18px);
+            }
+        }
+
+        /* SECTION HEADERS */
+        .section-header {
+            margin-bottom: 64px;
+        }
+
+        .section-tag {
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: 4px;
+            color: var(--teal);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .section-tag::before {
+            content: '';
+            width: 28px;
+            height: 1px;
+            background: var(--teal);
+        }
+
+        .section-title {
+            font-family: var(--display);
+            font-size: clamp(40px, 5vw, 62px);
+            letter-spacing: 2px;
+            line-height: 1;
+            color: var(--white);
+        }
+
+        .section-title span {
+            color: var(--cyan);
+        }
+
+        .section-sub {
+            margin-top: 16px;
+            max-width: 560px;
+            color: var(--mist);
+            font-weight: 300;
+            font-size: 16px;
+        }
+
+        /* PROBLEM SECTION */
+        #problem {
+            padding: 120px 60px;
+            background: linear-gradient(180deg, transparent, rgba(11, 31, 53, 0.6) 50%, transparent);
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: start;
+        }
+
+        .problem-text p {
+            color: var(--mist);
+            font-weight: 300;
+            margin-bottom: 20px;
+            line-height: 1.8;
+        }
+
+        .problem-text strong {
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        .mineral-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: var(--mono);
+            font-size: 12px;
+            margin-top: 24px;
+        }
+
+        .mineral-table th {
+            text-align: left;
+            padding: 10px 14px;
+            background: rgba(0, 212, 255, 0.08);
+            color: var(--cyan);
+            letter-spacing: 1.5px;
+            font-size: 10px;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .mineral-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.05);
+            color: var(--mist);
+        }
+
+        .mineral-table tr:hover td {
+            background: rgba(0, 212, 255, 0.04);
+        }
+
+        .tag-rare {
+            color: var(--gold);
+        }
+
+        .tag-critical {
+            color: var(--coral);
+        }
+
+        .tag-common {
+            color: var(--teal);
+        }
+
+        .callout-box {
+            margin-top: 32px;
+            padding: 24px;
+            border: 1px solid rgba(240, 165, 0, 0.3);
+            background: rgba(240, 165, 0, 0.05);
+            border-left: 3px solid var(--gold);
+        }
+
+        .callout-box p {
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--gold);
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        /* CONCEPT SECTION */
+        #concept {
+            padding: 120px 60px;
+        }
+
+        .concept-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 48px;
+        }
+
+        .concept-card {
+            padding: 32px;
+            border: 1px solid rgba(0, 212, 255, 0.1);
+            background: rgba(14, 45, 74, 0.3);
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .concept-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--cyan), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .concept-card:hover {
+            border-color: rgba(0, 212, 255, 0.3);
+            background: rgba(14, 45, 74, 0.6);
+            transform: translateY(-4px);
+        }
+
+        .concept-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 20px;
+        }
+
+        .card-num {
+            font-family: var(--display);
+            font-size: 72px;
+            color: rgba(0, 212, 255, 0.06);
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            line-height: 1;
+        }
+
+        .card-title {
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--cyan);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .card-body {
+            font-size: 14px;
+            color: var(--mist);
+            font-weight: 300;
+            line-height: 1.7;
+        }
+
+        /* END EFFECTOR */
+        #endeffector {
+            padding: 120px 60px;
+            background: linear-gradient(180deg, transparent, rgba(11, 31, 53, 0.5), transparent);
+        }
+
+        .effector-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 72px;
+            align-items: center;
+        }
+
+        .effector-diagram {
+            position: relative;
+        }
+
+        .spec-list {
+            list-style: none;
+            margin-top: 32px;
+        }
+
+        .spec-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.08);
+            font-size: 14px;
+        }
+
+        .spec-key {
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            color: var(--teal);
+            text-transform: uppercase;
+            min-width: 130px;
+            padding-top: 2px;
+        }
+
+        .spec-val {
+            color: var(--mist);
+            line-height: 1.5;
+        }
+
+        /* SENSOR SUITE */
+        #sensors {
+            padding: 120px 60px;
+        }
+
+        .sensor-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-top: 48px;
+        }
+
+        .sensor-card {
+            padding: 28px 22px;
+            border: 1px solid rgba(0, 212, 255, 0.08);
+            background: rgba(2, 12, 24, 0.8);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sensor-card::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            transform: scaleX(0);
+            background: var(--teal);
+            transition: transform 0.3s;
+        }
+
+        .sensor-card:hover {
+            border-color: rgba(0, 212, 255, 0.25);
+        }
+
+        .sensor-card:hover::after {
+            transform: scaleX(1);
+        }
+
+        .sensor-icon {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 16px;
+        }
+
+        .sensor-name {
+            font-family: var(--mono);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--cyan);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .sensor-model {
+            font-family: var(--mono);
+            font-size: 10px;
+            color: var(--gold);
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .sensor-desc {
+            font-size: 13px;
+            color: var(--dim);
+            line-height: 1.6;
+        }
+
+        /* SOFTWARE STACK */
+        #software {
+            padding: 120px 60px;
+            background: linear-gradient(180deg, transparent, rgba(11, 31, 53, 0.4), transparent);
+        }
+
+        .stack-diagram {
+            margin-top: 48px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-width: 900px;
+        }
+
+        .stack-layer {
+            display: flex;
+            align-items: stretch;
+            gap: 4px;
+        }
+
+        .stack-label {
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: var(--dim);
+            text-transform: uppercase;
+            writing-mode: vertical-lr;
+            transform: rotate(180deg);
+            padding: 12px 8px;
+            min-width: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .stack-blocks {
+            display: flex;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .stack-block {
+            flex: 1;
+            padding: 14px 16px;
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-align: center;
+            transition: all 0.2s;
+            cursor: default;
+        }
+
+        .stack-block:hover {
+            filter: brightness(1.2);
+        }
+
+        .layer-hardware {
+            background: rgba(0, 168, 150, 0.15);
+            border: 1px solid rgba(0, 168, 150, 0.25);
+            color: var(--teal);
+        }
+
+        .layer-middleware {
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            color: var(--cyan);
+        }
+
+        .layer-ros {
+            background: rgba(240, 165, 0, 0.1);
+            border: 1px solid rgba(240, 165, 0, 0.2);
+            color: var(--gold);
+        }
+
+        .layer-fusion {
+            background: rgba(255, 107, 74, 0.1);
+            border: 1px solid rgba(255, 107, 74, 0.2);
+            color: var(--coral);
+        }
+
+        .layer-mission {
+            background: rgba(0, 212, 255, 0.15);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            color: var(--cyan);
+            font-weight: 700;
+        }
+
+        .fusion-detail {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .fusion-card {
+            padding: 24px;
+            border: 1px solid rgba(255, 107, 74, 0.15);
+            background: rgba(255, 107, 74, 0.04);
+        }
+
+        .fusion-title {
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: var(--coral);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .fusion-desc {
+            font-size: 13px;
+            color: var(--mist);
+            line-height: 1.6;
+            font-weight: 300;
+        }
+
+        /* WORKFLOW */
+        #workflow {
+            padding: 120px 60px;
+        }
+
+        .workflow-steps {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 0;
+            margin-top: 56px;
+            position: relative;
+        }
+
+        .workflow-steps::before {
+            content: '';
+            position: absolute;
+            top: 36px;
+            left: 5%;
+            right: 5%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--cyan), transparent);
+            z-index: 0;
+        }
+
+        .workflow-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 0 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-dot {
+            width: 72px;
+            height: 72px;
+            border: 2px solid var(--cyan);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--deep);
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .step-dot:hover {
+            background: rgba(0, 212, 255, 0.15);
+            box-shadow: 0 0 24px rgba(0, 212, 255, 0.3);
+        }
+
+        .step-num {
+            font-family: var(--display);
+            font-size: 24px;
+            color: var(--cyan);
+            line-height: 1;
+        }
+
+        .step-title {
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            color: var(--mist);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .step-desc {
+            font-size: 12px;
+            color: var(--dim);
+            line-height: 1.5;
+        }
+
+        /* ROADMAP */
+        #roadmap {
+            padding: 120px 60px;
+            background: linear-gradient(180deg, transparent, rgba(11, 31, 53, 0.5), transparent);
+        }
+
+        .roadmap-timeline {
+            margin-top: 56px;
+            position: relative;
+        }
+
+        .roadmap-timeline::before {
+            content: '';
+            position: absolute;
+            left: 200px;
+            top: 0;
+            bottom: 0;
+            width: 1px;
+            background: linear-gradient(180deg, transparent, var(--cyan), var(--teal), var(--dim), transparent);
+        }
+
+        .roadmap-item {
+            display: flex;
+            gap: 0;
+            margin-bottom: 0;
+            position: relative;
+        }
+
+        .phase-label {
+            width: 200px;
+            min-width: 200px;
+            padding: 28px 32px 28px 0;
+            text-align: right;
+        }
+
+        .phase-name {
+            font-family: var(--display);
+            font-size: 22px;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+
+        .phase-period {
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: var(--dim);
+        }
+
+        .phase-node {
+            width: 14px;
+            min-width: 14px;
+            display: flex;
+            align-items: flex-start;
+            padding-top: 36px;
+            position: relative;
+        }
+
+        .phase-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            position: relative;
+            z-index: 1;
+        }
+
+        .phase-content {
+            flex: 1;
+            padding: 28px 0 28px 32px;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.06);
+        }
+
+        .phase-title {
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+        }
+
+        .phase-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .phase-tag {
+            padding: 5px 12px;
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: 1px;
+            border: 1px solid;
+            text-transform: uppercase;
+        }
+
+        .phase-1 .phase-name {
+            color: var(--cyan);
+        }
+
+        .phase-1 .phase-dot {
+            background: var(--cyan);
+            box-shadow: 0 0 12px var(--cyan);
+        }
+
+        .phase-1 .phase-title {
+            color: var(--cyan);
+        }
+
+        .phase-1 .phase-tag {
+            border-color: rgba(0, 212, 255, 0.3);
+            color: var(--cyan);
+            background: rgba(0, 212, 255, 0.07);
+        }
+
+        .phase-2 .phase-name {
+            color: var(--teal);
+        }
+
+        .phase-2 .phase-dot {
+            background: var(--teal);
+            box-shadow: 0 0 12px var(--teal);
+        }
+
+        .phase-2 .phase-title {
+            color: var(--teal);
+        }
+
+        .phase-2 .phase-tag {
+            border-color: rgba(0, 168, 150, 0.3);
+            color: var(--teal);
+            background: rgba(0, 168, 150, 0.07);
+        }
+
+        .phase-3 .phase-name {
+            color: var(--gold);
+        }
+
+        .phase-3 .phase-dot {
+            background: var(--gold);
+            box-shadow: 0 0 12px var(--gold);
+        }
+
+        .phase-3 .phase-title {
+            color: var(--gold);
+        }
+
+        .phase-3 .phase-tag {
+            border-color: rgba(240, 165, 0, 0.3);
+            color: var(--gold);
+            background: rgba(240, 165, 0, 0.07);
+        }
+
+        .phase-4 .phase-name {
+            color: var(--coral);
+        }
+
+        .phase-4 .phase-dot {
+            background: var(--coral);
+            box-shadow: 0 0 12px var(--coral);
+        }
+
+        .phase-4 .phase-title {
+            color: var(--coral);
+        }
+
+        .phase-4 .phase-tag {
+            border-color: rgba(255, 107, 74, 0.3);
+            color: var(--coral);
+            background: rgba(255, 107, 74, 0.07);
+        }
+
+        .prototype-banner {
+            margin: 48px 0;
+            padding: 28px 36px;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.08), rgba(0, 168, 150, 0.05));
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-left: 4px solid var(--cyan);
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .banner-icon {
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+
+        .banner-text h4 {
+            font-family: var(--mono);
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: var(--cyan);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .banner-text p {
+            font-size: 14px;
+            color: var(--mist);
+            font-weight: 300;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        /* TEAM */
+        #team {
+            padding: 120px 60px;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-top: 48px;
+        }
+
+        .team-card {
+            padding: 32px 24px;
+            border: 1px solid rgba(0, 212, 255, 0.08);
+            background: rgba(11, 31, 53, 0.3);
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .team-card:hover {
+            border-color: rgba(0, 212, 255, 0.25);
+            transform: translateY(-4px);
+        }
+
+        .avatar {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: rgba(0, 212, 255, 0.1);
+            border: 2px solid rgba(0, 212, 255, 0.2);
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--display);
+            font-size: 28px;
+            color: var(--cyan);
+        }
+
+        .team-name {
+            font-family: var(--mono);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--white);
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .team-role {
+            font-size: 12px;
+            color: var(--teal);
+            margin-bottom: 12px;
+            font-weight: 500;
+        }
+
+        .team-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .skill-tag {
+            padding: 3px 8px;
+            font-family: var(--mono);
+            font-size: 9px;
+            letter-spacing: 1px;
+            color: var(--dim);
+            border: 1px solid rgba(90, 122, 138, 0.3);
+            text-transform: uppercase;
+        }
+
+        /* FUTURE SCOPE */
+        #future {
+            padding: 120px 60px;
+            background: linear-gradient(180deg, transparent, rgba(11, 31, 53, 0.5), transparent);
+        }
+
+        .future-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-top: 48px;
+        }
+
+        .future-card {
+            padding: 32px;
+            border: 1px solid rgba(0, 212, 255, 0.08);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .future-card::before {
+            content: attr(data-depth);
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            font-family: var(--display);
+            font-size: 80px;
+            color: rgba(0, 212, 255, 0.04);
+            line-height: 1;
+            pointer-events: none;
+        }
+
+        .future-card:hover {
+            border-color: rgba(0, 212, 255, 0.2);
+            transform: translateY(-4px);
+        }
+
+        .future-phase {
+            font-family: var(--mono);
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .future-phase::before {
+            content: '';
+            width: 24px;
+            height: 1px;
+        }
+
+        .future-title {
+            font-family: var(--display);
+            font-size: 28px;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+        }
+
+        .future-desc {
+            font-size: 14px;
+            color: var(--mist);
+            font-weight: 300;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .future-depth {
+            font-family: var(--mono);
+            font-size: 11px;
+            letter-spacing: 1.5px;
+        }
+
+        .fc-1 .future-phase {
+            color: var(--cyan);
+        }
+
+        .fc-1 .future-phase::before {
+            background: var(--cyan);
+        }
+
+        .fc-1 .future-title {
+            color: var(--cyan);
+        }
+
+        .fc-1 .future-depth {
+            color: var(--cyan);
+        }
+
+        .fc-2 .future-phase {
+            color: var(--gold);
+        }
+
+        .fc-2 .future-phase::before {
+            background: var(--gold);
+        }
+
+        .fc-2 .future-title {
+            color: var(--gold);
+        }
+
+        .fc-2 .future-depth {
+            color: var(--gold);
+        }
+
+        .fc-3 .future-phase {
+            color: var(--coral);
+        }
+
+        .fc-3 .future-phase::before {
+            background: var(--coral);
+        }
+
+        .fc-3 .future-title {
+            color: var(--coral);
+        }
+
+        .fc-3 .future-depth {
+            color: var(--coral);
+        }
+
+        /* FOOTER */
+        footer {
+            padding: 60px;
+            border-top: 1px solid rgba(0, 212, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-brand {
+            font-family: var(--display);
+            font-size: 32px;
+            letter-spacing: 4px;
+            color: var(--cyan);
+        }
+
+        .footer-brand span {
+            color: var(--gold);
+        }
+
+        .footer-info {
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--dim);
+            letter-spacing: 1.5px;
+            text-align: right;
+            line-height: 1.8;
+        }
+
+        /* DIVIDER */
+        .divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.15), transparent);
+            margin: 0 60px;
+            width: calc(100% - 120px);
+        }
+
+        /* ANIMATIONS */
+        @keyframes scan {
+            0% {
+                transform: translateY(-100%);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+        }
+
+        /* PRESSURE CHAMBER */
+        #chamber {
+            padding: 120px 60px;
+        }
+
+        .chamber-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 72px;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <nav>
+        <a href="#hero" class="nav-logo">AUV Proposal<span>.</span></a>
+        <ul class="nav-links">
+            <li><a href="#problem">Problem</a></li>
+            <li><a href="#concept">Concept</a></li>
+            <li><a href="#sensors">Sensors</a></li>
+            <li><a href="#systems">Systems</a></li>
+            <li><a href="#software">Software</a></li>
+            <li><a href="#roadmap">Roadmap</a></li>
+            <li><a href="#team">Team</a></li>
+        </ul>
+        <div class="nav-badge">Prototype v0.1</div>
+    </nav>
+
+    <!-- HERO -->
+    <section id="hero">
+
+        <!-- Depth lines -->
+        <div class="hero-depth-lines">
+            <div class="depth-line" style="top:15%;width:85%;animation-delay:0s;"></div>
+            <div class="depth-line" style="top:28%;width:70%;animation-delay:0.8s;"></div>
+            <div class="depth-line" style="top:42%;width:90%;animation-delay:1.6s;"></div>
+            <div class="depth-line" style="top:58%;width:60%;animation-delay:0.4s;"></div>
+            <div class="depth-line" style="top:72%;width:78%;animation-delay:2.0s;"></div>
+            <div class="depth-line" style="top:85%;width:65%;animation-delay:1.2s;"></div>
+        </div>
+
+        <!-- ROV SVG -->
+        <div class="hero-rov-container">
+            <svg class="rov-glow" viewBox="0 0 480 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Ambient glow -->
+                <ellipse cx="240" cy="210" rx="180" ry="140" fill="rgba(0,212,255,0.03)" />
+                <!-- Depth marker lines -->
+                <line x1="10" y1="60" x2="460" y2="60" stroke="rgba(0,212,255,0.08)" stroke-width="1"
+                    stroke-dasharray="4,8" />
+                <line x1="10" y1="120" x2="460" y2="120" stroke="rgba(0,212,255,0.05)" stroke-width="1"
+                    stroke-dasharray="4,8" />
+                <text x="14" y="57" font-family="Space Mono" font-size="9" fill="rgba(0,212,255,0.3)">— 10m</text>
+                <text x="14" y="117" font-family="Space Mono" font-size="9" fill="rgba(0,212,255,0.2)">— 25m</text>
+
+                <!-- MAIN CHASSIS -->
+                <rect x="110" y="150" width="260" height="100" rx="6" fill="rgba(14,45,74,0.9)" stroke="#00d4ff"
+                    stroke-width="1.5" />
+                <!-- Chassis detail lines -->
+                <line x1="110" y1="175" x2="370" y2="175" stroke="rgba(0,212,255,0.2)" stroke-width="1" />
+                <line x1="110" y1="225" x2="370" y2="225" stroke="rgba(0,212,255,0.2)" stroke-width="1" />
+                <rect x="130" y="155" width="80" height="20" rx="2" fill="rgba(0,212,255,0.08)"
+                    stroke="rgba(0,212,255,0.2)" stroke-width="0.5" />
+                <text x="138" y="169" font-family="Space Mono" font-size="7.5" fill="rgba(0,212,255,0.7)">MAIN
+                    HULL</text>
+
+                <!-- THRUSTERS - sides -->
+                <ellipse cx="90" cy="170" rx="18" ry="10" fill="rgba(0,168,150,0.3)" stroke="#00a896"
+                    stroke-width="1.5" />
+                <ellipse cx="90" cy="170" rx="10" ry="5" fill="rgba(0,168,150,0.5)" />
+                <line x1="90" y1="160" x2="90" y2="150" stroke="#00a896" stroke-width="1.5" />
+                <text x="68" y="148" font-family="Space Mono" font-size="7" fill="#00a896">T1</text>
+
+                <ellipse cx="390" cy="170" rx="18" ry="10" fill="rgba(0,168,150,0.3)" stroke="#00a896"
+                    stroke-width="1.5" />
+                <ellipse cx="390" cy="170" rx="10" ry="5" fill="rgba(0,168,150,0.5)" />
+                <text x="396" y="148" font-family="Space Mono" font-size="7" fill="#00a896">T2</text>
+
+                <ellipse cx="90" cy="230" rx="18" ry="10" fill="rgba(0,168,150,0.3)" stroke="#00a896"
+                    stroke-width="1.5" />
+                <ellipse cx="90" cy="230" rx="10" ry="5" fill="rgba(0,168,150,0.5)" />
+                <text x="68" y="255" font-family="Space Mono" font-size="7" fill="#00a896">T3</text>
+
+                <ellipse cx="390" cy="230" rx="18" ry="10" fill="rgba(0,168,150,0.3)" stroke="#00a896"
+                    stroke-width="1.5" />
+                <ellipse cx="390" cy="230" rx="10" ry="5" fill="rgba(0,168,150,0.5)" />
+                <text x="396" y="255" font-family="Space Mono" font-size="7" fill="#00a896">T4</text>
+
+                <!-- VERTICAL THRUSTERS -->
+                <ellipse cx="175" cy="143" rx="10" ry="18" fill="rgba(0,212,255,0.2)" stroke="#00d4ff"
+                    stroke-width="1.2" />
+                <ellipse cx="175" cy="143" rx="5" ry="10" fill="rgba(0,212,255,0.4)" />
+                <text x="164" y="127" font-family="Space Mono" font-size="7" fill="#00d4ff">T5▲</text>
+
+                <ellipse cx="305" cy="143" rx="10" ry="18" fill="rgba(0,212,255,0.2)" stroke="#00d4ff"
+                    stroke-width="1.2" />
+                <ellipse cx="305" cy="143" rx="5" ry="10" fill="rgba(0,212,255,0.4)" />
+                <text x="294" y="127" font-family="Space Mono" font-size="7" fill="#00d4ff">T6▲</text>
+
+                <!-- CAMERA & SONAR DOME -->
+                <ellipse cx="100" cy="200" rx="22" ry="22" fill="rgba(240,165,0,0.12)" stroke="#f0a500"
+                    stroke-width="1.5" />
+                <ellipse cx="100" cy="200" rx="12" ry="12" fill="rgba(240,165,0,0.25)" />
+                <circle cx="100" cy="200" r="4" fill="#f0a500" />
+                <text x="74" y="232" font-family="Space Mono" font-size="7" fill="#f0a500">CAM+SONAR</text>
+
+                <!-- NIR SENSOR -->
+                <rect x="350" y="185" width="28" height="28" rx="3" fill="rgba(255,107,74,0.15)" stroke="#ff6b4a"
+                    stroke-width="1.2" />
+                <circle cx="364" cy="199" r="6" fill="rgba(255,107,74,0.4)" stroke="#ff6b4a" stroke-width="1" />
+                <text x="342" y="225" font-family="Space Mono" font-size="7" fill="#ff6b4a">NIR SPEC</text>
+
+                <!-- SAMPLING CHAMBER -->
+                <rect x="185" y="256" width="110" height="40" rx="3" fill="rgba(0,168,150,0.15)" stroke="#00a896"
+                    stroke-width="1.2" />
+                <rect x="195" y="261" width="90" height="30" rx="2" fill="rgba(0,168,150,0.08)"
+                    stroke="rgba(0,168,150,0.3)" stroke-width="0.5" />
+                <text x="193" y="279" font-family="Space Mono" font-size="7.5" fill="#00a896">SAMPLE CHAMBER</text>
+
+                <!-- TETHER CONNECTOR -->
+                <rect x="220" y="140" width="40" height="12" rx="2" fill="rgba(0,212,255,0.2)" stroke="#00d4ff"
+                    stroke-width="1" />
+                <text x="222" y="149" font-family="Space Mono" font-size="6.5" fill="#00d4ff">TETHER</text>
+
+                <!-- END EFFECTOR ARM -->
+                <line x1="240" y1="296" x2="240" y2="340" stroke="#00d4ff" stroke-width="2" />
+                <!-- Claw base -->
+                <rect x="214" y="340" width="52" height="14" rx="3" fill="rgba(0,212,255,0.15)" stroke="#00d4ff"
+                    stroke-width="1.5" />
+                <!-- Claw finger L -->
+                <path d="M220 354 L205 374 L215 374 L224 354Z" fill="rgba(0,212,255,0.2)" stroke="#00d4ff"
+                    stroke-width="1.2" />
+                <!-- Claw finger R -->
+                <path d="M260 354 L275 374 L265 374 L256 354Z" fill="rgba(0,212,255,0.2)" stroke="#00d4ff"
+                    stroke-width="1.2" />
+                <!-- Suction cup center -->
+                <ellipse cx="240" cy="374" rx="12" ry="8" fill="rgba(0,212,255,0.3)" stroke="#00d4ff"
+                    stroke-width="1.5" />
+                <ellipse cx="240" cy="374" rx="5" ry="3" fill="#00d4ff" />
+                <text x="204" y="392" font-family="Space Mono" font-size="7.5" fill="#00d4ff">TRI-ACTUATOR CLAW</text>
+
+                <!-- MAGNETOMETER -->
+                <rect x="320" y="246" width="50" height="20" rx="2" fill="rgba(90,122,138,0.2)"
+                    stroke="rgba(90,122,138,0.5)" stroke-width="1" />
+                <text x="325" y="260" font-family="Space Mono" font-size="7" fill="rgba(168,200,216,0.6)">MAG /
+                    IMU</text>
+
+                <!-- IMU box -->
+                <rect x="130" y="246" width="40" height="20" rx="2" fill="rgba(90,122,138,0.2)"
+                    stroke="rgba(90,122,138,0.5)" stroke-width="1" />
+                <text x="135" y="260" font-family="Space Mono" font-size="7" fill="rgba(168,200,216,0.6)">ROS2</text>
+
+                <!-- Signal arcs from sonar -->
+                <path d="M78 190 Q60 200 78 210" stroke="rgba(240,165,0,0.4)" stroke-width="1" fill="none"
+                    stroke-dasharray="2,3" />
+                <path d="M70 185 Q45 200 70 215" stroke="rgba(240,165,0,0.25)" stroke-width="1" fill="none"
+                    stroke-dasharray="2,3" />
+                <path d="M62 180 Q30 200 62 220" stroke="rgba(240,165,0,0.12)" stroke-width="1" fill="none"
+                    stroke-dasharray="2,3" />
+
+                <!-- Bubble particles -->
+                <circle cx="160" cy="90" r="3" fill="rgba(0,212,255,0.2)" stroke="rgba(0,212,255,0.4)"
+                    stroke-width="0.8" />
+                <circle cx="230" cy="70" r="2" fill="rgba(0,212,255,0.15)" stroke="rgba(0,212,255,0.3)"
+                    stroke-width="0.8" />
+                <circle cx="310" cy="85" r="2.5" fill="rgba(0,212,255,0.2)" stroke="rgba(0,212,255,0.35)"
+                    stroke-width="0.8" />
+                <circle cx="360" cy="75" r="1.5" fill="rgba(0,212,255,0.15)" />
+                <circle cx="185" cy="105" r="2" fill="rgba(0,212,255,0.12)" />
+
+                <!-- LABEL CALLOUTS -->
+                <text x="240" y="415" font-family="Space Mono" font-size="8" fill="rgba(0,212,255,0.4)"
+                    text-anchor="middle" letter-spacing="3">AUV PROPOSAL — SYSTEM OVERVIEW</text>
+            </svg>
+        </div>
+
+        <div class="hero-eyebrow">Student R&D Initiative · Underwater Robotics</div>
+
+        <h1 class="hero-title">
+            AUV
+            <span class="accent"> Proposal</span>
+            <span class="sub">Rare Earth Mineral Prospecting System</span>
+        </h1>
+
+        <p class="hero-desc">
+            A modular, budget-conscious remotely operated vehicle designed for subsea rare-earth mineral detection and
+            sampling. Built as a shallow-water validation platform, engineered to scale.
+        </p>
+
+        <div class="hero-stats">
+            <div class="stat-block">
+                <div class="stat-num">200m</div>
+                <div class="stat-label">Prototype Depth</div>
+            </div>
+            <div class="stat-block">
+                <div class="stat-num">6-DOF</div>
+                <div class="stat-label">Motion Control</div>
+            </div>
+            <div class="stat-block">
+                <div class="stat-num">5+</div>
+                <div class="stat-label">Sensor Modalities</div>
+            </div>
+            <div class="stat-block">
+                <div class="stat-num">ROS2</div>
+                <div class="stat-label">Software Stack</div>
+            </div>
+        </div>
+
+        <div class="hero-cta">
+            <a href="#concept" class="btn-primary">Explore System</a>
+            <a href="#roadmap" class="btn-outline">View Roadmap</a>
+        </div>
+    </section>
+
+    <!-- PROBLEM -->
+    <section id="problem">
+        <div class="section-header" style="padding: 0 60px 0 60px;">
+            <div class="section-tag">01 — The Challenge</div>
+            <h2 class="section-title">Why the <span>Seabed?</span></h2>
+            <p class="section-sub">Critical rare-earth elements powering the green energy transition are locked in
+                hard-to-reach submarine deposits — demanding new, intelligent retrieval tools.</p>
+        </div>
+
+        <div class="problem-grid" style="padding: 0 60px;">
+            <div class="problem-text">
+                <p><strong>Rare earth elements (REEs)</strong> — spanning lanthanides and related critical minerals —
+                    are indispensable for EV motors, wind turbines, medical MRI machines, and defense systems. Global
+                    demand is projected to <strong>triple by 2040</strong>, yet terrestrial extraction faces intense
+                    geopolitical pressure and environmental constraints.</p>
+                <p>The seabed holds vast, largely untapped polymetallic nodule fields, cobalt-rich crusts on seamounts,
+                    and seafloor massive sulfide (SMS) deposits hosting <strong>cerium, neodymium, dysprosium,
+                        lanthanum, yttrium</strong>, and co-located cobalt, nickel, and manganese.</p>
+                <p>Current deep-sea mining concepts require billion-dollar investment. There is a critical unmet need
+                    for <strong>low-cost, modular prospecting platforms</strong> that can survey, classify, and
+                    selectively sample candidate sites before committing to large-scale extraction operations.</p>
+                <div class="callout-box">
+                    <p>⚡ This AUV proposal addresses the prospecting gap — delivering multi-modal mineral sensing,
+                        targeted
+                        sampling, and georeferenced data logging at a fraction of the cost of industrial ROVs. Prototype
+                        v0.1 validates the concept in controlled shallow-water environments.</p>
+                </div>
+            </div>
+            <div>
+                <table class="mineral-table">
+                    <thead>
+                        <tr>
+                            <th>Element</th>
+                            <th>Application</th>
+                            <th>Scarcity</th>
+                            <th>Depth Zone</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Neodymium (Nd)</td>
+                            <td>EV & wind turbine magnets</td>
+                            <td class="tag-critical">Critical</td>
+                            <td>&gt;4000m</td>
+                        </tr>
+                        <tr>
+                            <td>Dysprosium (Dy)</td>
+                            <td>High-temp permanent magnets</td>
+                            <td class="tag-critical">Critical</td>
+                            <td>&gt;4000m</td>
+                        </tr>
+                        <tr>
+                            <td>Cerium (Ce)</td>
+                            <td>Catalytic converters, optics</td>
+                            <td class="tag-rare">Rare</td>
+                            <td>&gt;4000m</td>
+                        </tr>
+                        <tr>
+                            <td>Lanthanum (La)</td>
+                            <td>Batteries, optics, alloys</td>
+                            <td class="tag-rare">Rare</td>
+                            <td>&gt;4000m</td>
+                        </tr>
+                        <tr>
+                            <td>Yttrium (Y)</td>
+                            <td>LEDs, superconductors</td>
+                            <td class="tag-critical">Critical</td>
+                            <td>&gt;4000m</td>
+                        </tr>
+                        <tr>
+                            <td>Cobalt (Co)</td>
+                            <td>Li-ion cathodes, superalloys</td>
+                            <td class="tag-rare">Rare</td>
+                            <td>200m–1000m</td>
+                        </tr>
+                        <tr>
+                            <td>Manganese (Mn)</td>
+                            <td>Steel, battery anodes</td>
+                            <td class="tag-common">Abundant</td>
+                            <td>200m–1000m</td>
+                        </tr>
+                        <tr>
+                            <td>Nickel (Ni)</td>
+                            <td>Battery cathodes, alloys</td>
+                            <td class="tag-common">Moderate</td>
+                            <td>200m–1000m</td>
+                        </tr>
+                        <tr>
+                            <td>Titanium (Ti)</td>
+                            <td>Aerospace, heavy industry</td>
+                            <td class="tag-common">Moderate</td>
+                            <td>0–200m</td>
+                        </tr>
+                        <tr>
+                            <td>Zirconium (Zr)</td>
+                            <td>Ceramics, nuclear reactors</td>
+                            <td class="tag-common">Abundant</td>
+                            <td>0–200m</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONCEPT -->
+    <section id="concept">
+        <div class="section-header" style="padding: 0 60px;">
+            <div class="section-tag">02 — The ROV Concept</div>
+            <h2 class="section-title">AUV <span>Architecture</span></h2>
+            <p class="section-sub">A six-degree-of-freedom tethered ROV with modular payload bays, designed for
+                iterative hardware upgrades without chassis redesign.</p>
+        </div>
+
+        <div class="concept-cards">
+            <div class="concept-card">
+                <div class="card-num">01</div>
+                <svg class="card-icon" viewBox="0 0 48 48" fill="none">
+                    <rect x="8" y="16" width="32" height="20" rx="3" stroke="#00d4ff" stroke-width="1.5" />
+                    <circle cx="16" cy="26" r="5" stroke="#00a896" stroke-width="1.5" />
+                    <line x1="24" y1="10" x2="24" y2="16" stroke="#00d4ff" stroke-width="1.5" />
+                    <ellipse cx="36" cy="20" rx="4" ry="8" stroke="#00a896" stroke-width="1.2" />
+                    <ellipse cx="12" cy="20" rx="4" ry="8" stroke="#00a896" stroke-width="1.2" />
+                </svg>
+                <div class="card-title">6-DOF Chassis</div>
+                <div class="card-body">Aluminum-framed or HDPE-panel open-frame body with 6 brushless DC thrusters in a
+                    vectored configuration. Buoyancy balanced via syntactic foam inserts. Depth-rated to 50m in v0.1
+                    with upgradeable housing for deeper variants.</div>
+            </div>
+            <div class="concept-card">
+                <div class="card-num">02</div>
+                <svg class="card-icon" viewBox="0 0 48 48" fill="none">
+                    <path d="M24 38 L24 18" stroke="#00d4ff" stroke-width="2" />
+                    <rect x="16" y="18" width="16" height="6" rx="2" stroke="#00d4ff" stroke-width="1.5" />
+                    <path d="M12 24 L8 36 L18 36 L16 24" stroke="#00d4ff" stroke-width="1.2"
+                        fill="rgba(0,212,255,0.1)" />
+                    <path d="M36 24 L40 36 L30 36 L32 24" stroke="#00d4ff" stroke-width="1.2"
+                        fill="rgba(0,212,255,0.1)" />
+                    <ellipse cx="24" cy="37" rx="8" ry="4" stroke="#f0a500" stroke-width="1.5" />
+                    <circle cx="24" cy="37" r="2" fill="#f0a500" />
+                </svg>
+                <div class="card-title">Tri-Actuator End Effector</div>
+                <div class="card-body">A hybrid claw-suction manipulator with three pneumatic/servo-driven fingers plus
+                    a central venturi suction port. Handles both loose sediment grab and attached crust fragment
+                    acquisition in a single tool assembly.</div>
+            </div>
+            <div class="concept-card">
+                <div class="card-num">03</div>
+                <svg class="card-icon" viewBox="0 0 48 48" fill="none">
+                    <rect x="14" y="22" width="20" height="16" rx="2" stroke="#00a896" stroke-width="1.5" />
+                    <rect x="18" y="26" width="12" height="8" rx="1" stroke="rgba(0,168,150,0.5)" stroke-width="1" />
+                    <path d="M18 38 L18 44 M30 38 L30 44" stroke="#00a896" stroke-width="1.5" />
+                    <path d="M22 22 L22 16 M26 22 L26 16" stroke="#00a896" stroke-width="1.2" />
+                    <rect x="20" y="12" width="8" height="4" rx="1" stroke="#00d4ff" stroke-width="1.2" />
+                </svg>
+                <div class="card-title">Sampling Chamber</div>
+                <div class="card-body">Pressure-equalized cylindrical chamber with independent sample compartments. A
+                    motorized valve isolates collected specimens from water ingress. Capacity for 4 discrete sample
+                    types per dive, with depth-compensated sealing.</div>
+            </div>
+            <div class="concept-card">
+                <div class="card-num">04</div>
+                <svg class="card-icon" viewBox="0 0 48 48" fill="none">
+                    <circle cx="24" cy="24" r="14" stroke="#f0a500" stroke-width="1.5" />
+                    <circle cx="24" cy="24" r="6" stroke="#f0a500" stroke-width="1.2" />
+                    <path d="M10 24 Q18 18 24 24 Q30 30 38 24" stroke="rgba(240,165,0,0.5)" stroke-width="1"
+                        fill="none" />
+                    <path d="M10 24 Q18 30 24 24 Q30 18 38 24" stroke="rgba(240,165,0,0.3)" stroke-width="1"
+                        fill="none" />
+                </svg>
+                <div class="card-title">Sensor Suite</div>
+                <div class="card-body">Dual-frequency forward-looking sonar, 4K downward-facing camera, NIR
+                    hyperspectral sensor, 3-axis magnetometer, and 9-DOF IMU. All sensors feed a centralized ROS2 sensor
+                    fusion pipeline in real-time.</div>
+            </div>
+            <div class="concept-card">
+                <div class="card-num">05</div>
+                <svg class="card-icon" viewBox="0 0 48 48" fill="none">
+                    <rect x="8" y="10" width="32" height="8" rx="2" stroke="#ff6b4a" stroke-width="1.5" />
+                    <rect x="8" y="22" width="32" height="8" rx="2" stroke="#00d4ff" stroke-width="1.5" />
+                    <rect x="8" y="34" width="32" height="8" rx="2" stroke="#00a896" stroke-width="1.5" />
+                    <line x1="24" y1="18" x2="24" y2="22" stroke="#00d4ff" stroke-width="1.2" />
+                    <line x1="24" y1="30" x2="24" y2="34" stroke="#00a896" stroke-width="1.2" />
+                </svg>
+                <div class="card-title">Software Stack</div>
+                <div class="card-body">ROS2 Humble middleware with MAVLink telemetry bridging. ArduSub firmware on
+                    Pixhawk flight controller manages thruster PID loops. Topside laptop/Raspberry Pi 5 runs the ground
+                    control interface and data logger.</div>
+            </div>
+            <div class="concept-card">
+                <div class="card-num">06</div>
+                <svg class="card-icon" viewBox="0 0 48 48" fill="none">
+                    <path d="M8 40 L24 10 L40 40Z" stroke="#00d4ff" stroke-width="1.5" fill="rgba(0,212,255,0.07)" />
+                    <circle cx="24" cy="26" r="8" stroke="#00a896" stroke-width="1.2" />
+                    <circle cx="24" cy="26" r="3" fill="#00a896" />
+                    <line x1="24" y1="18" x2="24" y2="14" stroke="#00a896" stroke-width="1.2" />
+                </svg>
+                <div class="card-title">Tether + Comms</div>
+                <div class="card-body">Neutrally buoyant fiber-reinforced tether carrying 48V power and 100 Mbps
+                    Ethernet. Topside tether management spool with slip ring. Optional acoustic modem upgrade for
+                    untethered telemetry in deeper variants.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- END EFFECTOR -->
+    <section id="endeffector" style="padding: 120px 60px;">
+        <div class="section-header">
+            <div class="section-tag">03 — End Effector</div>
+            <h2 class="section-title">Tri-Actuator <span>Hybrid Claw</span></h2>
+            <p class="section-sub">A purpose-built manipulator combining mechanical grip with pneumatic suction —
+                handling both unconsolidated sediment and hard crust fragments without tool swaps.</p>
+        </div>
+
+        <div class="effector-layout">
+            <div>
+                <!-- End Effector Detailed SVG -->
+                <svg viewBox="0 0 400 380" fill="none" xmlns="http://www.w3.org/2000/svg"
+                    style="width:100%;border:1px solid rgba(0,212,255,0.08);background:rgba(2,12,24,0.6);">
+                    <!-- Grid -->
+                    <defs>
+                        <pattern id="smallgrid" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(0,212,255,0.04)" stroke-width="0.5" />
+                        </pattern>
+                    </defs>
+                    <rect width="400" height="380" fill="url(#smallgrid)" />
+
+                    <!-- ARM SHAFT -->
+                    <rect x="185" y="20" width="30" height="80" rx="4" fill="rgba(0,212,255,0.12)" stroke="#00d4ff"
+                        stroke-width="1.5" />
+                    <text x="192" y="38" font-family="Space Mono" font-size="7" fill="rgba(0,212,255,0.5)">ARM</text>
+                    <text x="188" y="50" font-family="Space Mono" font-size="7" fill="rgba(0,212,255,0.5)">SHAFT</text>
+
+                    <!-- ACTUATOR BASE -->
+                    <rect x="150" y="100" width="100" height="30" rx="4" fill="rgba(0,212,255,0.15)" stroke="#00d4ff"
+                        stroke-width="1.8" />
+                    <text x="165" y="120" font-family="Space Mono" font-size="8" fill="#00d4ff">ACTUATOR BASE</text>
+
+                    <!-- SERVO MOTORS -->
+                    <rect x="155" y="130" width="22" height="22" rx="3" fill="rgba(0,168,150,0.2)" stroke="#00a896"
+                        stroke-width="1.2" />
+                    <text x="159" y="145" font-family="Space Mono" font-size="7" fill="#00a896">SV1</text>
+                    <rect x="189" y="130" width="22" height="22" rx="3" fill="rgba(0,168,150,0.2)" stroke="#00a896"
+                        stroke-width="1.2" />
+                    <text x="193" y="145" font-family="Space Mono" font-size="7" fill="#00a896">SV2</text>
+                    <rect x="223" y="130" width="22" height="22" rx="3" fill="rgba(0,168,150,0.2)" stroke="#00a896"
+                        stroke-width="1.2" />
+                    <text x="227" y="145" font-family="Space Mono" font-size="7" fill="#00a896">SV3</text>
+
+                    <!-- FINGER LINKS -->
+                    <!-- Left finger -->
+                    <path d="M165 152 L130 210 L140 214 L175 156Z" fill="rgba(0,212,255,0.1)" stroke="#00d4ff"
+                        stroke-width="1.5" />
+                    <!-- Center finger -->
+                    <path d="M200 152 L200 218 L210 218 L210 152Z" fill="rgba(0,212,255,0.12)" stroke="#00d4ff"
+                        stroke-width="1.5" />
+                    <!-- Right finger -->
+                    <path d="M235 152 L270 210 L260 214 L225 156Z" fill="rgba(0,212,255,0.1)" stroke="#00d4ff"
+                        stroke-width="1.5" />
+
+                    <!-- FINGERTIP PADS -->
+                    <ellipse cx="135" cy="215" rx="14" ry="8" fill="rgba(0,168,150,0.3)" stroke="#00a896"
+                        stroke-width="1.5" />
+                    <text x="116" y="233" font-family="Space Mono" font-size="7" fill="#00a896">GRIP PAD</text>
+                    <ellipse cx="205" cy="222" rx="14" ry="8" fill="rgba(0,168,150,0.3)" stroke="#00a896"
+                        stroke-width="1.5" />
+                    <ellipse cx="265" cy="215" rx="14" ry="8" fill="rgba(0,168,150,0.3)" stroke="#00a896"
+                        stroke-width="1.5" />
+                    <text x="246" y="233" font-family="Space Mono" font-size="7" fill="#00a896">GRIP PAD</text>
+
+                    <!-- SUCTION ASSEMBLY -->
+                    <circle cx="205" cy="260" r="28" fill="rgba(240,165,0,0.1)" stroke="#f0a500" stroke-width="1.8" />
+                    <circle cx="205" cy="260" r="18" fill="rgba(240,165,0,0.15)" stroke="rgba(240,165,0,0.4)"
+                        stroke-width="1" />
+                    <circle cx="205" cy="260" r="8" fill="rgba(240,165,0,0.25)" stroke="#f0a500" stroke-width="1.5" />
+                    <circle cx="205" cy="260" r="3" fill="#f0a500" />
+                    <text x="152" y="300" font-family="Space Mono" font-size="8" fill="#f0a500">VENTURI SUCTION
+                        PORT</text>
+
+                    <!-- VACUUM PUMP LINE -->
+                    <path d="M205 232 L205 222" stroke="rgba(240,165,0,0.5)" stroke-width="2" stroke-dasharray="3,3" />
+                    <text x="210" y="228" font-family="Space Mono" font-size="7"
+                        fill="rgba(240,165,0,0.6)">VACUUM</text>
+
+                    <!-- ANNOTATION LINES -->
+                    <line x1="275" y1="170" x2="320" y2="150" stroke="rgba(168,200,216,0.2)" stroke-width="0.8"
+                        stroke-dasharray="3,5" />
+                    <text x="324" y="154" font-family="Space Mono" font-size="7.5" fill="rgba(168,200,216,0.5)">120°
+                        spacing</text>
+
+                    <line x1="350" y1="215" x2="284" y2="215" stroke="rgba(168,200,216,0.2)" stroke-width="0.8"
+                        stroke-dasharray="3,5" />
+                    <text x="355" y="218" font-family="Space Mono" font-size="7.5" fill="rgba(168,200,216,0.5)">Silicone
+                        tips</text>
+
+                    <line x1="350" y1="260" x2="233" y2="260" stroke="rgba(240,165,0,0.2)" stroke-width="0.8"
+                        stroke-dasharray="3,5" />
+                    <text x="355" y="263" font-family="Space Mono" font-size="7.5" fill="rgba(240,165,0,0.5)">0.5 bar
+                        vacuum</text>
+
+                    <!-- TITLE -->
+                    <text x="200" y="358" text-anchor="middle" font-family="Space Mono" font-size="9"
+                        fill="rgba(0,212,255,0.35)" letter-spacing="2">TRI-ACTUATOR HYBRID END EFFECTOR</text>
+                </svg>
+            </div>
+            <div>
+                <ul class="spec-list">
+                    <li>
+                        <span class="spec-key">Mechanism</span>
+                        <span class="spec-val">Three servo-driven fingers at 120° radial spacing. Independent actuation
+                            allows pinch, scoop, and conform grips for irregular rock nodule geometry.</span>
+                    </li>
+                    <li>
+                        <span class="spec-key">Suction Mode</span>
+                        <span class="spec-val">Central venturi suction cup powered by a miniature DC vacuum pump. Target
+                            vacuum pressure: 0.4–0.6 bar. Effective for loose sediment, fine-grained deposits, and small
+                            nodules ≤5 cm.</span>
+                    </li>
+                    <li>
+                        <span class="spec-key">Force Budget</span>
+                        <span class="spec-val">Each finger servo rated for 15 kg·cm torque (waterproof MG996R or
+                            equivalent). Aggregate grip force estimated at 8–12 N on 30mm object diameter.</span>
+                    </li>
+                    <li>
+                        <span class="spec-key">Materials</span>
+                        <span class="spec-val">316L stainless steel linkages, Delrin (POM) knuckle joints, silicone
+                            finger pad inserts rated to 100m depth. Frame printed in PETG with CF reinforcement.</span>
+                    </li>
+                    <li>
+                        <span class="spec-key">Control Interface</span>
+                        <span class="spec-val">ROS2 joint command topic, servo positions interpolated via PWM from
+                            Raspberry Pi GPIO or dedicated servo controller. Closed-loop force sensing via strain gauge
+                            in v0.2.</span>
+                    </li>
+                    <li>
+                        <span class="spec-key">Sample Transfer</span>
+                        <span class="spec-val">Collected material deposited into the pressure-controlled sampling
+                            chamber via a funnel guide rail and motorized trap door — hands-free sample handoff
+                            cycle.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- PBOF SYSTEM -->
+    <section id="chamber">
+        <div class="section-header" style="padding: 0 60px 0;">
+            <div class="section-tag">04 — Core Infrastructure</div>
+            <h2 class="section-title">Pressure-Balanced <span>Oil-Filled System</span></h2>
+            <p class="section-sub">A lightweight, scalable alternative to full titanium enclosures, enabling
+                cost-effective deep-sea system design by operating in a pressure-neutral state.</p>
+        </div>
+        <div class="chamber-layout" style="padding: 0 60px;">
+            <div>
+                <!-- PBOF SVG Concept -->
+                <svg viewBox="0 0 420 300" fill="none" xmlns="http://www.w3.org/2000/svg"
+                    style="width:100%;border:1px solid rgba(0,168,150,0.1);background:rgba(2,12,24,0.6);">
+                    <defs>
+                        <pattern id="cg2" width="20" height="20" patternUnits="userSpaceOnUse">
+                            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(0,168,150,0.04)" stroke-width="0.5" />
+                        </pattern>
+                        <linearGradient id="oilGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="rgba(0,168,150,0.3)" />
+                            <stop offset="100%" stop-color="rgba(0,168,150,0.1)" />
+                        </linearGradient>
+                    </defs>
+                    <rect width="420" height="300" fill="url(#cg2)" />
+
+                    <!-- OUTER HOUSING (RIGID FRAME) -->
+                    <rect x="60" y="60" width="300" height="180" fill="none" stroke="#00d4ff" stroke-width="2"
+                        stroke-dasharray="8,4" />
+
+                    <!-- OIL FILLED BLADDER (FLEXIBLE) -->
+                    <path d="M70 70 Q 210 50 350 70 Q 370 150 350 230 Q 210 250 70 230 Q 50 150 70 70 Z"
+                        fill="url(#oilGrad)" stroke="#00a896" stroke-width="2" />
+
+                    <!-- PRESSURE COMPENSATOR PISTON -->
+                    <rect x="180" y="30" width="60" height="40" rx="3" fill="rgba(0,212,255,0.15)" stroke="#00d4ff"
+                        stroke-width="1.5" />
+                    <line x1="210" y1="20" x2="210" y2="30" stroke="#00d4ff" stroke-width="2" />
+                    <text x="210" y="50" font-family="Space Mono" font-size="8" fill="#00d4ff"
+                        text-anchor="middle">COMPENSATOR</text>
+
+                    <!-- ELECTRONICS BOARDS (Submerged) -->
+                    <rect x="110" y="110" width="80" height="80" rx="2" fill="rgba(240,165,0,0.15)" stroke="#f0a500"
+                        stroke-width="1.5" />
+                    <line x1="120" y1="130" x2="180" y2="130" stroke="#f0a500" stroke-width="1" />
+                    <line x1="120" y1="150" x2="180" y2="150" stroke="#f0a500" stroke-width="1" />
+                    <line x1="120" y1="170" x2="180" y2="170" stroke="#f0a500" stroke-width="1" />
+                    <text x="150" y="122" font-family="Space Mono" font-size="7" fill="#f0a500"
+                        text-anchor="middle">SUBMERGED PCBs</text>
+
+                    <rect x="230" y="110" width="80" height="80" rx="2" fill="rgba(240,165,0,0.15)" stroke="#f0a500"
+                        stroke-width="1.5" />
+                    <circle cx="270" cy="150" r="15" fill="rgba(240,165,0,0.1)" stroke="#f0a500" stroke-width="1" />
+                    <text x="270" y="122" font-family="Space Mono" font-size="7" fill="#f0a500"
+                        text-anchor="middle">POWER MGMT</text>
+
+                    <!-- EXTERNAL CAMERA HOUSING (TITANIUM) -->
+                    <rect x="340" y="125" width="40" height="50" rx="4" fill="rgba(255,107,74,0.15)" stroke="#ff6b4a"
+                        stroke-width="1.5" />
+                    <ellipse cx="380" cy="150" rx="6" ry="15" fill="rgba(255,107,74,0.3)" />
+                    <text x="360" y="115" font-family="Space Mono" font-size="7" fill="#ff6b4a"
+                        text-anchor="middle">TITANIUM CAM</text>
+                    <text x="390" y="152" font-family="Space Mono" font-size="5" fill="#ff6b4a"
+                        writing-mode="vertical-rl">SAPPHIRE</text>
+
+                    <!-- ANNOTATIONS -->
+                    <line x1="210" y1="200" x2="210" y2="280" stroke="rgba(0,168,150,0.5)" stroke-width="1"
+                        stroke-dasharray="3,3" />
+                    <text x="210" y="275" font-family="Space Mono" font-size="9" fill="#00a896" text-anchor="middle"
+                        letter-spacing="1">DIELECTRIC SILICONE OIL</text>
+                </svg>
+            </div>
+            <div>
+                <ul class="spec-list">
+                    <li>
+                        <span class="spec-key">Core Concept</span>
+                        <span class="spec-val">Internal electronics are submerged in dielectric silicone oil. This
+                            allows internal pressure to completely match external ocean pressure via a bladder/piston
+                            compensator, eliminating structural stress.</span>
+                    </li>
+                    <li>
+                        <span class="spec-key">Oil Functions</span>
+                        <span class="spec-val">Silicone oil acts as a near-incompressible pressure equalizer, a pristine
+                            electrical insulator, and a highly efficient thermal management medium for high-power subsea
+                            electronics.</span>
+                    </li>
+                    <li>
+                        <span class="spec-key">Optics Isolation</span>
+                        <span class="spec-val">Because oil alters refractive indices, the camera module is isolated in a
+                            separate, rigid titanium housing with a sapphire window, maintaining internal atmospheric
+                            pressure.</span>
+                    </li>
+                    <li>
+                        <span class="spec-key">Key Advantages</span>
+                        <span class="spec-val">Reduces the need for heavy, expensive pressure-resistant hulls. Lowers
+                            overall system weight, reduces fabrication costs, and improves reliability in deep
+                            environments (inspired by real offshore ROVs).</span>
+                    </li>
+                    <li>
+                        <span class="spec-key">Engineering Needs</span>
+                        <span class="spec-val">Requires oil-compatible surface mount electronics, robust thermal
+                            management, subsea sealed cable-entry connectors, and a rigid framework to replace a
+                            traditional outer hull.</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- SENSORS -->
+    <section id="sensors">
+        <div class="section-header" style="padding: 0 60px;">
+            <div class="section-tag">05 — Sensor Suite</div>
+            <h2 class="section-title">Multi-Modal <span>Sensing</span></h2>
+            <p class="section-sub">Five complementary sensor modalities provide redundant mineral classification,
+                enabling confident site scoring even in turbid or low-light seabed conditions.</p>
+        </div>
+
+        <div class="sensor-grid" style="padding: 0 60px;">
+            <div class="sensor-card">
+                <svg class="sensor-icon" viewBox="0 0 40 40" fill="none">
+                    <path d="M5 30 Q10 20 15 25 Q20 15 25 22 Q30 12 35 18" stroke="#f0a500" stroke-width="1.8"
+                        fill="none" />
+                    <circle cx="5" cy="20" r="4" fill="rgba(240,165,0,0.2)" stroke="#f0a500" stroke-width="1.2" />
+                    <path d="M2 20 Q0 14 2 8" stroke="rgba(240,165,0,0.3)" stroke-width="1" stroke-dasharray="2,2"
+                        fill="none" />
+                    <path d="M8 20 Q12 12 8 6" stroke="rgba(240,165,0,0.2)" stroke-width="1" stroke-dasharray="2,2"
+                        fill="none" />
+                </svg>
+                <div class="sensor-name">Sonar</div>
+                <div class="sensor-model">PING2 / Dual-Freq</div>
+                <div class="sensor-desc">BlueRobotics Ping2 single-beam sonar for bottom-lock altimetry. Optional DVL
+                    upgrade for velocity-aided navigation. Dual frequency (115 kHz / 460 kHz) separates sediment
+                    backscatter from hard-substrate returns.</div>
+            </div>
+            <div class="sensor-card">
+                <svg class="sensor-icon" viewBox="0 0 40 40" fill="none">
+                    <rect x="5" y="10" width="30" height="22" rx="3" stroke="#00d4ff" stroke-width="1.5" />
+                    <circle cx="20" cy="21" r="7" stroke="#00d4ff" stroke-width="1.2" />
+                    <circle cx="20" cy="21" r="3" fill="rgba(0,212,255,0.4)" />
+                    <rect x="15" y="6" width="10" height="4" rx="1" stroke="rgba(0,212,255,0.5)" stroke-width="1" />
+                </svg>
+                <div class="sensor-name">Camera</div>
+                <div class="sensor-model">4K UHD · 120fps</div>
+                <div class="sensor-desc">Wide-angle 4K underwater camera with adjustable LED ring illumination. Supports
+                    photogrammetric 3D reconstruction of surveyed sites using Structure-from-Motion post-processing.
+                    Video streamed over tether H.264.</div>
+            </div>
+            <div class="sensor-card">
+                <svg class="sensor-icon" viewBox="0 0 40 40" fill="none">
+                    <rect x="8" y="8" width="24" height="24" rx="2" stroke="#ff6b4a" stroke-width="1.5" />
+                    <line x1="8" y1="17" x2="32" y2="17" stroke="rgba(255,107,74,0.3)" stroke-width="1" />
+                    <line x1="8" y1="23" x2="32" y2="23" stroke="rgba(255,107,74,0.3)" stroke-width="1" />
+                    <line x1="8" y1="29" x2="32" y2="29" stroke="rgba(255,107,74,0.3)" stroke-width="1" />
+                    <path d="M14 8 L14 32" stroke="rgba(255,107,74,0.3)" stroke-width="1" />
+                    <path d="M20 8 L20 32" stroke="rgba(255,107,74,0.3)" stroke-width="1" />
+                    <path d="M26 8 L26 32" stroke="rgba(255,107,74,0.3)" stroke-width="1" />
+                    <circle cx="20" cy="20" r="4" fill="rgba(255,107,74,0.3)" stroke="#ff6b4a" stroke-width="1.2" />
+                </svg>
+                <div class="sensor-name">NIR Spectral</div>
+                <div class="sensor-model">AS7265x / μNIR</div>
+                <div class="sensor-desc">Near-infrared spectral sensing using AS7265x tri-spectrum IC (410–940nm, 18
+                    channels). Identifies characteristic absorption bands of cerium, neodymium, and iron-oxide minerals.
+                    Housed in a depth-rated waterproof enclosure with sapphire window.</div>
+            </div>
+            <div class="sensor-card">
+                <svg class="sensor-icon" viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="12" stroke="#00a896" stroke-width="1.5" />
+                    <path d="M20 8 L20 32" stroke="#00a896" stroke-width="1.2" />
+                    <path d="M8 20 L32 20" stroke="#00a896" stroke-width="1.2" />
+                    <circle cx="20" cy="20" r="3" fill="#00a896" />
+                    <path d="M14 14 L26 26" stroke="rgba(0,168,150,0.4)" stroke-width="1" />
+                    <path d="M26 14 L14 26" stroke="rgba(0,168,150,0.4)" stroke-width="1" />
+                </svg>
+                <div class="sensor-name">Magnetometer</div>
+                <div class="sensor-model">QMC5883L · 3-axis</div>
+                <div class="sensor-desc">3-axis digital magnetometer detecting anomalies in Earth's field indicative of
+                    iron-rich or REE-bearing mineral concentrations. Cross-correlated with IMU heading to separate
+                    vehicle-induced magnetic noise from environmental signal.</div>
+            </div>
+            <div class="sensor-card">
+                <svg class="sensor-icon" viewBox="0 0 40 40" fill="none">
+                    <rect x="12" y="10" width="16" height="20" rx="2" stroke="#00d4ff" stroke-width="1.5" />
+                    <path d="M8 20 L12 20 M28 20 L32 20" stroke="#00d4ff" stroke-width="1.5" />
+                    <path d="M20 6 L20 10 M20 30 L20 34" stroke="#00d4ff" stroke-width="1.5" />
+                    <circle cx="20" cy="20" r="3" fill="rgba(0,212,255,0.4)" stroke="#00d4ff" stroke-width="1" />
+                    <path d="M15 15 Q14 20 15 25" stroke="rgba(0,212,255,0.3)" stroke-width="1" fill="none" />
+                    <path d="M25 15 Q26 20 25 25" stroke="rgba(0,212,255,0.3)" stroke-width="1" fill="none" />
+                </svg>
+                <div class="sensor-name">IMU</div>
+                <div class="sensor-model">ICM-42688 · 9-DOF</div>
+                <div class="sensor-desc">9-DOF inertial measurement unit providing 3-axis accelerometer, gyroscope, and
+                    magnetometer data at 1 kHz. Feeds EKF-based state estimator in ArduSub/ROS2. Critical for
+                    depth-hold, attitude stabilization, and dead-reckoning between GPS fixes.</div>
+            </div>
+            <div class="sensor-card">
+                <svg class="sensor-icon" viewBox="0 0 40 40" fill="none">
+                    <rect x="6" y="14" width="28" height="16" rx="2" stroke="#00a896" stroke-width="1.5" />
+                    <path d="M14 14 L14 10 M20 14 L20 8 M26 14 L26 10" stroke="rgba(0,168,150,0.5)"
+                        stroke-width="1.2" />
+                    <line x1="12" y1="22" x2="16" y2="22" stroke="#00a896" stroke-width="1.5" />
+                    <line x1="18" y1="22" x2="24" y2="22" stroke="#00a896" stroke-width="1.5" />
+                    <line x1="26" y1="22" x2="28" y2="22" stroke="#00a896" stroke-width="1.5" />
+                    <text x="11" y="27" font-family="Space Mono" font-size="5" fill="#00a896">STATUS</text>
+                </svg>
+                <div class="sensor-name">Depth / Pressure</div>
+                <div class="sensor-model">MS5837-30BA · ±2mm</div>
+                <div class="sensor-desc">High-resolution pressure and temperature sensor (0–300 m range, ±2 mm
+                    resolution). Provides absolute depth for sample provenance logging and serves as z-axis ground truth
+                    for the navigation filter and altitude-hold controller.</div>
+            </div>
+            <div class="sensor-card">
+                <svg class="sensor-icon" viewBox="0 0 40 40" fill="none">
+                    <rect x="8" y="8" width="24" height="24" rx="3" stroke="#f0a500" stroke-width="1.5" />
+                    <rect x="14" y="14" width="12" height="12" rx="1" fill="rgba(240,165,0,0.15)"
+                        stroke="rgba(240,165,0,0.5)" stroke-width="1" />
+                    <circle cx="20" cy="20" r="2" fill="#f0a500" />
+                    <line x1="20" y1="8" x2="20" y2="4" stroke="rgba(240,165,0,0.5)" stroke-width="1.2" />
+                    <line x1="32" y1="20" x2="36" y2="20" stroke="rgba(240,165,0,0.5)" stroke-width="1.2" />
+                </svg>
+                <div class="sensor-name">DVL (Future)</div>
+                <div class="sensor-model">WL-21701 Upgrade Path</div>
+                <div class="sensor-desc">Doppler Velocity Log planned for v0.3. Enables centimeter-accurate
+                    bottom-relative velocity for precise station-keeping and survey-grade georeferencing without surface
+                    GPS. Designed as a bolt-on payload bay addition.</div>
+            </div>
+            <div class="sensor-card">
+                <svg class="sensor-icon" viewBox="0 0 40 40" fill="none">
+                    <circle cx="20" cy="20" r="13" stroke="#00d4ff" stroke-width="1.5" stroke-dasharray="3,3" />
+                    <circle cx="20" cy="20" r="6" stroke="#00d4ff" stroke-width="1.5" />
+                    <path d="M20 7 L20 14 M20 26 L20 33 M7 20 L14 20 M26 20 L33 20" stroke="rgba(0,212,255,0.4)"
+                        stroke-width="1.2" />
+                    <circle cx="20" cy="20" r="2" fill="#00d4ff" />
+                </svg>
+                <div class="sensor-name">Acoustic Modem</div>
+                <div class="sensor-model">WLP-M64 — v0.3+</div>
+                <div class="sensor-desc">Acoustic data link for tether-free operation at extended ranges. Enables
+                    multi-ROV mesh survey patterns and long-range telemetry in v0.3 deep-water variants. Current tether
+                    architecture is pre-wired for acoustic modem power + serial bridge.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SOFTWARE -->
+    <section id="software">
+        <div class="section-header" style="padding: 0 60px;">
+            <div class="section-tag">06 — Software Stack</div>
+            <h2 class="section-title">ROS2 + MAVLink <span>Architecture</span></h2>
+            <p class="section-sub">A layered, open-source software architecture connecting autopilot firmware to
+                high-level mission planning, real-time sensor fusion, and operator ground control.</p>
+        </div>
+
+        <div style="padding: 0 60px;">
+            <div class="stack-diagram">
+                <div class="stack-layer">
+                    <div class="stack-label">Mission</div>
+                    <div class="stack-blocks">
+                        <div class="stack-block layer-mission">Survey Planner</div>
+                        <div class="stack-block layer-mission">Waypoint Nav</div>
+                        <div class="stack-block layer-mission">Sample Sequencer</div>
+                        <div class="stack-block layer-mission">Data Logger (ROS2 Bag)</div>
+                        <div class="stack-block layer-mission">Ground Control UI (QGC)</div>
+                    </div>
+                </div>
+                <div
+                    style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:2px;padding:6px 0;">
+                    ↕ ROS2 TOPICS / SERVICES / ACTIONS</div>
+                <div class="stack-layer">
+                    <div class="stack-label">Fusion</div>
+                    <div class="stack-blocks">
+                        <div class="stack-block layer-fusion">EKF2 State Estimator</div>
+                        <div class="stack-block layer-fusion">Magnetic Anomaly Detector</div>
+                        <div class="stack-block layer-fusion">NIR Mineral Classifier</div>
+                        <div class="stack-block layer-fusion">Sonar Pointcloud</div>
+                    </div>
+                </div>
+                <div
+                    style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:2px;padding:6px 0;">
+                    ↕ ROS2 HUMBLE MIDDLEWARE</div>
+                <div class="stack-layer">
+                    <div class="stack-label">ROS2</div>
+                    <div class="stack-blocks">
+                        <div class="stack-block layer-ros">mavros2 Bridge</div>
+                        <div class="stack-block layer-ros">Camera Node (cv_camera)</div>
+                        <div class="stack-block layer-ros">IMU Driver</div>
+                        <div class="stack-block layer-ros">Sonar Driver</div>
+                        <div class="stack-block layer-ros">End Effector Node</div>
+                    </div>
+                </div>
+                <div
+                    style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:2px;padding:6px 0;">
+                    ↕ MAVLink v2 (Serial / UDP)</div>
+                <div class="stack-layer">
+                    <div class="stack-label">Firmware</div>
+                    <div class="stack-blocks">
+                        <div class="stack-block layer-middleware">ArduSub (Pixhawk)</div>
+                        <div class="stack-block layer-middleware">6x ESC PWM</div>
+                        <div class="stack-block layer-middleware">PID Attitude Loop</div>
+                        <div class="stack-block layer-middleware">Depth-Hold Mode</div>
+                        <div class="stack-block layer-middleware">Stabilize Mode</div>
+                    </div>
+                </div>
+                <div
+                    style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:2px;padding:6px 0;">
+                    ↕ GPIO / SPI / I²C / UART</div>
+                <div class="stack-layer">
+                    <div class="stack-label">Hardware</div>
+                    <div class="stack-blocks">
+                        <div class="stack-block layer-hardware">6× Thruster (T200)</div>
+                        <div class="stack-block layer-hardware">IMU (ICM-42688)</div>
+                        <div class="stack-block layer-hardware">NIR Sensor</div>
+                        <div class="stack-block layer-hardware">Sonar (Ping2)</div>
+                        <div class="stack-block layer-hardware">Camera</div>
+                        <div class="stack-block layer-hardware">Magnetometer</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="fusion-detail">
+                <div class="fusion-card">
+                    <div class="fusion-title">EKF Sensor Fusion</div>
+                    <div class="fusion-desc">Extended Kalman Filter fuses IMU, depth sensor, sonar altitude, and
+                        magnetometer heading into a single 15-state pose estimate. Runs at 200 Hz on Raspberry Pi 5
+                        compute module. Dead-reckoning fallback during sonar dropouts.</div>
+                </div>
+                <div class="fusion-card">
+                    <div class="fusion-title">MAVLink Integration</div>
+                    <div class="fusion-desc">ArduSub firmware communicates over MAVLink v2 via mavros2 bridge. All
+                        vehicle states (attitude, depth, GPS, battery, mode) published as ROS2 topics. Control commands
+                        sent as SET_POSITION_TARGET_LOCAL_NED messages at 50 Hz.</div>
+                </div>
+                <div class="fusion-card">
+                    <div class="fusion-title">Mineral Classification</div>
+                    <div class="fusion-desc">NIR spectral readings processed by a lightweight CNN trained on REE mineral
+                        spectral libraries. Magnetometer readings processed by anomaly detection filter. Combined
+                        confidence score triggers the end effector sampling sequence autonomously.</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CORE SYSTEMS -->
+    <section id="systems">
+        <div class="section-header" style="padding: 0 60px;">
+            <div class="section-tag">06.5 — Core Systems</div>
+            <h2 class="section-title">Technical <span>Infrastructure</span></h2>
+            <p class="section-sub">Robust subsystems engineered for reliable power, communication, and pressure
+                tolerance in challenging environments.</p>
+        </div>
+
+        <div style="padding: 0 60px; margin-bottom: 80px;">
+            <div class="fusion-detail">
+                <div class="fusion-card">
+                    <div class="fusion-title">Pressure System</div>
+                    <div class="fusion-desc">
+                        <ul style="padding-left: 20px; color: var(--mist); margin: 0;">
+                            <li style="margin-bottom: 8px;"><strong>Oil-Filled Balancing:</strong> Pressure-Balanced
+                                Oil-Filled (PBOF) design continuously equalizes internal and external pressure.</li>
+                            <li style="margin-bottom: 8px;"><strong>Structural Integrity:</strong> Drastically reduced
+                                structural stress, enabling deeper operation without heavy enclosures.</li>
+                            <li><strong>Titanium Housing:</strong> Critical optical sensors protected by high-strength,
+                                corrosion-resistant titanium enclosures.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="fusion-card">
+                    <div class="fusion-title">Navigation & Comm</div>
+                    <div class="fusion-desc">
+                        <ul style="padding-left: 20px; color: var(--mist); margin: 0;">
+                            <li style="margin-bottom: 8px;"><strong>Sensor Suite:</strong> Integrated IMU, multiple
+                                SONAR arrays, and high-precision Depth sensors.</li>
+                            <li style="margin-bottom: 8px;"><strong>Sensor Fusion:</strong> Extended Kalman Filter (EKF)
+                                state estimation for robust, drift-free localization.</li>
+                            <li><strong>Telemetry:</strong> High-bandwidth tether connection combined with optional
+                                acoustic modem for tether-free data links.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="fusion-card">
+                    <div class="fusion-title">Power System</div>
+                    <div class="fusion-desc">
+                        <ul style="padding-left: 20px; color: var(--mist); margin: 0;">
+                            <li style="margin-bottom: 8px;"><strong>Surface Power:</strong> High-voltage surface power
+                                delivered via umbilical tether for unlimited mission endurance.</li>
+                            <li style="margin-bottom: 8px;"><strong>Power Conversion:</strong> Highly efficient onboard
+                                DC-DC converters step down and regulate voltage for thrusters.</li>
+                            <li><strong>Battery Backup:</strong> Optional onboard lithium battery pack provides
+                                emergency power for safe return-to-surface.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WORKFLOW -->
+    <section id="workflow">
+        <div class="section-header" style="padding: 0 60px;">
+            <div class="section-tag">07 — System Workflow</div>
+            <h2 class="section-title">Mission <span>Sequence</span></h2>
+            <p class="section-sub">A repeatable six-stage dive cycle from surface deployment to data upload, designed
+                for single-operator control with semi-autonomous sampling trigger logic.</p>
+        </div>
+
+        <div class="workflow-steps" style="padding: 0 60px;">
+            <div class="workflow-step">
+                <div class="step-dot"><span class="step-num">1</span></div>
+                <div class="step-title">Deploy</div>
+                <div class="step-desc">ROV lowered from vessel. Tether paid out. Depth-hold engaged at 2m. System
+                    self-check.</div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-dot"><span class="step-num">2</span></div>
+                <div class="step-title">Survey</div>
+                <div class="step-desc">Sonar scanning, video capture, and magnetometer sweep. Waypoint-guided lawnmower
+                    pattern.</div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-dot"><span class="step-num">3</span></div>
+                <div class="step-title">Detect</div>
+                <div class="step-desc">NIR + MAG anomaly scoring in real-time. Candidate sites flagged and
+                    georeferenced.</div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-dot"><span class="step-num">4</span></div>
+                <div class="step-title">Sample</div>
+                <div class="step-desc">End effector triggered. Claw or suction mode selected. Sample deposited to
+                    chamber.</div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-dot"><span class="step-num">5</span></div>
+                <div class="step-title">Ascend</div>
+                <div class="step-desc">Chamber sealed. ROV returns to surface via guided waypoint or tether tension
+                    detect.</div>
+            </div>
+            <div class="workflow-step">
+                <div class="step-dot"><span class="step-num">6</span></div>
+                <div class="step-title">Log</div>
+                <div class="step-desc">ROS2 bag synced to laptop. Sample metadata merged with GPS and depth logs. Report
+                    generated.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ROADMAP -->
+    <section id="roadmap">
+        <div class="section-header" style="padding: 0 60px;">
+            <div class="section-tag">08 — Development Roadmap</div>
+            <h2 class="section-title">Build <span>Phases</span></h2>
+        </div>
+
+        <div style="padding: 0 60px;">
+            <div class="prototype-banner">
+                <div class="banner-icon">🧪</div>
+                <div class="banner-text">
+                    <h4>Prototype v0.1 — Modular Budget Demonstrator</h4>
+                    <p>The first prototype is a deliberately budget-conscious, modular demonstrator built for controlled
+                        shallow-water (≤15m) pool and coastal validation. Every subsystem is designed as a replaceable
+                        module, enabling iterative hardware upgrades without redesigning the chassis. This is the
+                        foundation, not the ceiling. Each subsequent phase deepens capability, depth rating, and
+                        autonomy.</p>
+                </div>
+            </div>
+
+            <div class="roadmap-timeline">
+                <div class="roadmap-item phase-1">
+                    <div class="phase-label">
+                        <div class="phase-name">Phase 1</div>
+                        <div class="phase-period">Months 1–4</div>
+                    </div>
+                    <div class="phase-node">
+                        <div class="phase-dot"></div>
+                    </div>
+                    <div class="phase-content">
+                        <div class="phase-title">Shallow-Water Demonstrator (v0.1) — ≤15m Pool Validation</div>
+                        <div class="phase-items">
+                            <span class="phase-tag">Open-frame chassis (HDPE)</span>
+                            <span class="phase-tag">4× BlueRobotics T200 thrusters</span>
+                            <span class="phase-tag">Pixhawk + ArduSub</span>
+                            <span class="phase-tag">ROS2 Humble base install</span>
+                            <span class="phase-tag">MAVLink telemetry</span>
+                            <span class="phase-tag">Ping2 sonar</span>
+                            <span class="phase-tag">4K camera + LED ring</span>
+                            <span class="phase-tag">NIR sensor (AS7265x)</span>
+                            <span class="phase-tag">Basic claw prototype</span>
+                            <span class="phase-tag">Pool testing</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="roadmap-item phase-2">
+                    <div class="phase-label">
+                        <div class="phase-name">Phase 2</div>
+                        <div class="phase-period">Months 5–8</div>
+                    </div>
+                    <div class="phase-node">
+                        <div class="phase-dot"></div>
+                    </div>
+                    <div class="phase-content">
+                        <div class="phase-title">Coastal ROV (v0.2) — ≤50m Open Water</div>
+                        <div class="phase-items">
+                            <span class="phase-tag">6-DOF thruster config</span>
+                            <span class="phase-tag">Tri-actuator end effector v1</span>
+                            <span class="phase-tag">Pressure sampling chamber</span>
+                            <span class="phase-tag">Magnetometer integration</span>
+                            <span class="phase-tag">Full sensor fusion EKF</span>
+                            <span class="phase-tag">Strain-gauge gripper feedback</span>
+                            <span class="phase-tag">Depth-rated housing (50m)</span>
+                            <span class="phase-tag">Coastal field trials</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="roadmap-item phase-3">
+                    <div class="phase-label">
+                        <div class="phase-name">Phase 3</div>
+                        <div class="phase-period">Months 9–14</div>
+                    </div>
+                    <div class="phase-node">
+                        <div class="phase-dot"></div>
+                    </div>
+                    <div class="phase-content">
+                        <div class="phase-title">Prospecting ROV (v0.3) — ≤200m Shelf-Depth</div>
+                        <div class="phase-items">
+                            <span class="phase-tag">DVL upgrade (WL-21701)</span>
+                            <span class="phase-tag">Acoustic modem</span>
+                            <span class="phase-tag">Autonomous survey modes</span>
+                            <span class="phase-tag">ML mineral classifier v2</span>
+                            <span class="phase-tag">Modular payload bay</span>
+                            <span class="phase-tag">200m pressure housing</span>
+                            <span class="phase-tag">Survey-grade SfM mapping</span>
+                            <span class="phase-tag">Partner ship trials</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="roadmap-item phase-4">
+                    <div class="phase-label">
+                        <div class="phase-name">Phase 4</div>
+                        <div class="phase-period">Months 15–24</div>
+                    </div>
+                    <div class="phase-node">
+                        <div class="phase-dot"></div>
+                    </div>
+                    <div class="phase-content">
+                        <div class="phase-title">Deep-Water Platform (v1.0) — ≤2000m</div>
+                        <div class="phase-items">
+                            <span class="phase-tag">Titanium / anodized Al frame</span>
+                            <span class="phase-tag">Multi-ROV swarm comms</span>
+                            <span class="phase-tag">Full autonomy stack</span>
+                            <span class="phase-tag">Hyper-spectral payload</span>
+                            <span class="phase-tag">Industry partnership</span>
+                            <span class="phase-tag">IP filing</span>
+                            <span class="phase-tag">2000m certification</span>
+                            <span class="phase-tag">Commercial licensing</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- COMPONENTS -->
+    <section id="components" style="padding-bottom: 80px;">
+        <div class="section-header" style="padding: 0 60px;">
+            <div class="section-tag">08.5 — System BOM</div>
+            <h2 class="section-title">Required <span>Components</span></h2>
+            <p class="section-sub">A comprehensive bill of materials spanning electronics, mechanical assemblies, and the software stack required to deploy the AUV prototype.</p>
+        </div>
+        
+        <div style="padding: 0 60px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px;">
+            
+            <!-- Category 1: Electronics -->
+            <div style="background: rgba(2,12,24,0.6); border: 1px solid rgba(0,212,255,0.1); border-radius: 8px; padding: 24px;">
+                <div style="display: flex; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(0,212,255,0.1); padding-bottom: 12px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2" style="margin-right: 12px;"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    <h3 style="color: var(--cyan); font-family: var(--display); letter-spacing: 1px; font-size: 20px; margin:0;">Electronics</h3>
+                </div>
+                <ul style="list-style: none; padding: 0; margin: 0; color: var(--mist); font-size: 14px; line-height: 1.6;">
+                    <li style="margin-bottom: 8px;"><strong style="color:var(--white)">Main Compute:</strong> Intel NUC or Raspberry Pi 4/5</li>
+                    <li style="margin-bottom: 8px;"><strong style="color:var(--white)">Flight Controller:</strong> Pixhawk 4/6X (ArduSub)</li>
+                    <li style="margin-bottom: 8px;"><strong style="color:var(--white)">Actuation:</strong> Waterproof high-torque servos (MG996R)</li>
+                    <li style="margin-bottom: 8px;"><strong style="color:var(--white)">Power Mgmt:</strong> DC-DC Buck Converters & PDB</li>
+                    <li style="margin-bottom: 8px;"><strong style="color:var(--white)">Propulsion:</strong> Subsea BLDC Thrusters & ESCs</li>
+                    <li><strong style="color:var(--white)">Sensing/IMU:</strong> BlueRobotics PingSonar & MS5837-30BA </li>
+                </ul>
+            </div>
+
+            <!-- Category 2: Mechanical -->
+            <div style="background: rgba(2,12,24,0.6); border: 1px solid rgba(0,168,150,0.1); border-radius: 8px; padding: 24px;">
+                <div style="display: flex; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(0,168,150,0.1); padding-bottom: 12px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2" style="margin-right: 12px;"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                    <h3 style="color: var(--teal); font-family: var(--display); letter-spacing: 1px; font-size: 20px; margin:0;">Mechanical</h3>
+                </div>
+                <ul style="list-style: none; padding: 0; margin: 0; color: var(--mist); font-size: 14px; line-height: 1.6;">
+                    <li style="margin-bottom: 8px;"><strong style="color:var(--white)">Arm Linkages:</strong> 316L Stainless Steel / Delrin Knuckles</li>
+                    <li style="margin-bottom: 8px;"><strong style="color:var(--white)">Chassis:</strong> T-Slot Aluminum Extrusions & PETG with CF</li>
+                    <li style="margin-bottom: 8px;"><strong style="color:var(--white)">End Effector:</strong> Tri-actuator silicone fingered grips</li>
+                    <li style="margin-bottom: 8px;"><strong style="color:var(--white)">Sampling Chamber:</strong> Polycarbonate cylinders & active pistons</li>
+                    <li><strong style="color:var(--white)">PBOF System:</strong> Flexible structural bladder housing compensator</li>
+                </ul>
+            </div>
+
+            <!-- Category 3: Hardware & Housings -->
+            <div style="background: rgba(2,12,24,0.6); border: 1px solid rgba(240,165,0,0.1); border-radius: 8px; padding: 24px;">
+                <div style="display: flex; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(240,165,0,0.1); padding-bottom: 12px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2" style="margin-right: 12px;"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/></svg>
+                    <h3 style="color: var(--gold); font-family: var(--display); letter-spacing: 1px; font-size: 20px; margin:0;">Hardware</h3>
+                </div>
+                <ul style="list-style: none; padding: 0; margin: 0; color: var(--mist); font-size: 14px; line-height: 1.6;">
+                    <li style="margin-bottom: 8px;"><strong style="color:var(--white)">Camera Housing:</strong> Depth-rated Titanium enclosure</li>
+                    <li style="margin-bottom: 8px;"><strong style="color:var(--white)">Optics:</strong> High-pressure polished Sapphire Window</li>
+                    <li style="margin-bottom: 8px;"><strong style="color:var(--white)">Seals:</strong> Dual Viton rated O-Rings</li>
+                    <li style="margin-bottom: 8px;"><strong style="color:var(--white)">Connectors:</strong> Subsea Wet-mate bulkheads</li>
+                    <li><strong style="color:var(--white)">Tether:</strong> Neutral buoyancy fiber/copper umbilical</li>
+                </ul>
+            </div>
+
+            <!-- Category 4: Software -->
+            <div style="background: rgba(2,12,24,0.6); border: 1px solid rgba(255,107,74,0.1); border-radius: 8px; padding: 24px;">
+                <div style="display: flex; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(255,107,74,0.1); padding-bottom: 12px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--coral)" stroke-width="2" style="margin-right: 12px;"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                    <h3 style="color: var(--coral); font-family: var(--display); letter-spacing: 1px; font-size: 20px; margin:0;">Software</h3>
+                </div>
+                <ul style="list-style: none; padding: 0; margin: 0; color: var(--mist); font-size: 14px; line-height: 1.6;">
+                    <li style="margin-bottom: 8px;"><strong style="color:var(--white)">Middleware:</strong> ROS 2 (Hardware interfacing/topics)</li>
+                    <li style="margin-bottom: 8px;"><strong style="color:var(--white)">Flight Code:</strong> ArduPilot Custom / ArduSub (MAVLink v2)</li>
+                    <li style="margin-bottom: 8px;"><strong style="color:var(--white)">Computer Vision:</strong> OpenCV & TensorFlow (Nodule Classification)</li>
+                    <li style="margin-bottom: 8px;"><strong style="color:var(--white)">UI/UX:</strong> QGroundControl (Operator Control Station)</li>
+                    <li><strong style="color:var(--white)">Estimation:</strong> EKF2 Sensor Fusion pipeline</li>
+                </ul>
+            </div>
+
+            <!-- Category 5: Other / Materials -->
+            <div style="background: rgba(2,12,24,0.6); border: 1px solid rgba(168,200,216,0.15); border-radius: 8px; padding: 24px;">
+                <div style="display: flex; align-items: center; margin-bottom: 16px; border-bottom: 1px solid rgba(168,200,216,0.15); padding-bottom: 12px;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(168,200,216,1)" stroke-width="2" style="margin-right: 12px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                    <h3 style="color: rgba(168,200,216,1); font-family: var(--display); letter-spacing: 1px; font-size: 20px; margin:0;">Other Supplies</h3>
+                </div>
+                <ul style="list-style: none; padding: 0; margin: 0; color: var(--mist); font-size: 14px; line-height: 1.6;">
+                    <li style="margin-bottom: 8px;"><strong style="color:var(--white)">Fluids:</strong> Dielectric Silicone Oil (Thermal & Pressure match)</li>
+                    <li style="margin-bottom: 8px;"><strong style="color:var(--white)">Power Source:</strong> Shore Power Tether & Lithium-ion Pack</li>
+                    <li style="margin-bottom: 8px;"><strong style="color:var(--white)">Buoyancy:</strong> 100m+ depth-rated Syntactic Foam blocks</li>
+                    <li style="margin-bottom: 8px;"><strong style="color:var(--white)">Fasteners:</strong> Marine-grade A4 Stainless Steel socket bolts</li>
+                    <li><strong style="color:var(--white)">Calibrants:</strong> Color & Spectral checker targets</li>
+                </ul>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- TEAM -->
+    <section id="team">
+        <div class="section-header" style="padding: 0 60px;">
+            <div class="section-tag">09 — The Team</div>
+            <h2 class="section-title">Proposed by Students of <span>PMEC Berhampur</span></h2>
+            <p class="section-sub">An interdisciplinary team combining mechanical engineering, electronics, software,
+                and geology expertise — united by a shared mission to make seabed prospecting accessible.</p>
+        </div>
+        <div class="team-grid" style="padding: 0 60px;">
+            <div class="team-card">
+                <div class="avatar">SM</div>
+                <div class="team-name">Seikh Souvagya Mustakim</div>
+                <div class="team-role">3rd Year ETC</div>
+            </div>
+            <div class="team-card">
+                <div class="avatar">AH</div>
+                <div class="team-name">Asutosh Hota</div>
+                <div class="team-role">2nd Year Mechanical</div>
+            </div>
+            <div class="team-card">
+                <div class="avatar">SB</div>
+                <div class="team-name">Spandana Behera</div>
+                <div class="team-role">3rd Year ETC</div>
+            </div>
+            <div class="team-card">
+                <div class="avatar">AK</div>
+                <div class="team-name">Arpit Kumar Khamari</div>
+                <div class="team-role">3rd Year ETC</div>
+            </div>
+            <div class="team-card">
+                <div class="avatar">ST</div>
+                <div class="team-name">Srusti Sikha Tripathy</div>
+                <div class="team-role">3rd Year ETC</div>
+            </div>
+            <div class="team-card">
+                <div class="avatar">DS</div>
+                <div class="team-name">Deepak Sahu</div>
+                <div class="team-role">2nd Year Electrical</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FUTURE SCOPE -->
+    <section id="future">
+        <div class="section-header" style="padding: 0 60px;">
+            <div class="section-tag">10 — Future Scope</div>
+            <h2 class="section-title">Depth-Based <span>Strategy</span></h2>
+            <p class="section-sub">A mature, industry-aligned roadmap. We adapt our strategy to depth
+                constraints—performing full extraction in shallower practical demonstration zones, and focusing strictly
+                on surveyed detection at extreme depths.</p>
+        </div>
+
+        <div class="future-grid" style="padding: 0 60px;">
+            <div class="future-card fc-1" data-depth="200m">
+                <div class="future-phase">Prototype Phase</div>
+                <div class="future-title">0–200m TARGET</div>
+                <div class="future-desc">
+                    <div style="margin-bottom: 12px;"><strong>Target Materials:</strong><br><span
+                            style="color:var(--mist)">Titanium-bearing minerals, Zirconium (zircon sands), Heavy mineral
+                            deposits.</span></div>
+                    <div style="margin-bottom: 12px;"><strong>Capabilities (Full Operation):</strong><br><span
+                            style="color:var(--mist)">Manipulation, Sampling, and Onboard analysis.</span></div>
+                    <div style="color: var(--cyan); font-weight: 500;">👉 Practical demonstration phase</div>
+                </div>
+                <div class="future-depth">Depth: 0m → 200m</div>
+            </div>
+            <div class="future-card fc-2" data-depth="1000m">
+                <div class="future-phase">Intermediate Scope</div>
+                <div class="future-title">200m–1000m TARGET</div>
+                <div class="future-desc">
+                    <div style="margin-bottom: 12px;"><strong>Target Materials:</strong><br><span
+                            style="color:var(--mist)">Polymetallic nodules, Metal-rich sediments.</span></div>
+                    <div style="margin-bottom: 12px;"><strong>Capabilities:</strong><br><span
+                            style="color:var(--mist)">Partial sampling, Improved sensing, Better navigation for deeper
+                            waters.</span></div>
+                </div>
+                <div class="future-depth">Depth: 200m → 1000m</div>
+            </div>
+            <div class="future-card fc-3" data-depth="4000m+">
+                <div class="future-phase">Advanced Vision Focus</div>
+                <div class="future-title">&gt;4000m TARGET</div>
+                <div class="future-desc">
+                    <div style="margin-bottom: 12px;"><strong>Target Materials:</strong><br><span
+                            style="color:var(--mist)">Rare earth-rich sediments, Gas hydrates (🔥).</span></div>
+                    <div style="margin-bottom: 12px;"><strong>Strategy Shift:</strong><br><span
+                            style="color:var(--coral)">❌ No heavy actuation.</span><br><span
+                            style="color:var(--mist)">Extreme pressure makes mechanics complex. Focus shifts entirely to
+                            Detection, Mapping, and Data Collection.</span></div>
+                    <div style="color: var(--teal); font-weight: 500;">✅ Aligns with real industry "survey first"
+                        deep-sea missions.</div>
+                </div>
+                <div class="future-depth">Depth: &gt;4000m</div>
+            </div>
+        </div>
+
+        <!-- Applications row -->
+        <div style="padding: 48px 60px 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;">
+            <div style="padding: 24px; border: 1px solid rgba(0,212,255,0.07); text-align:center;">
+                <div
+                    style="font-family:var(--display);font-size:22px;color:var(--cyan);letter-spacing:2px;margin-bottom:10px;">
+                    CLEAN ENERGY</div>
+                <div style="font-size:13px;color:var(--dim);">Nd, Dy for next-gen wind turbine and EV drive magnets
+                </div>
+            </div>
+            <div style="padding: 24px; border: 1px solid rgba(0,212,255,0.07); text-align:center;">
+                <div
+                    style="font-family:var(--display);font-size:22px;color:var(--teal);letter-spacing:2px;margin-bottom:10px;">
+                    DEFENCE</div>
+                <div style="font-size:13px;color:var(--dim);">Rare earths for radar, sonar, and guidance system
+                    components</div>
+            </div>
+            <div style="padding: 24px; border: 1px solid rgba(0,212,255,0.07); text-align:center;">
+                <div
+                    style="font-family:var(--display);font-size:22px;color:var(--gold);letter-spacing:2px;margin-bottom:10px;">
+                    TECHNOLOGY</div>
+                <div style="font-size:13px;color:var(--dim);">Y, Ce, La for semiconductors, optics, and display
+                    manufacturing</div>
+            </div>
+            <div style="padding: 24px; border: 1px solid rgba(0,212,255,0.07); text-align:center;">
+                <div
+                    style="font-family:var(--display);font-size:22px;color:var(--coral);letter-spacing:2px;margin-bottom:10px;">
+                    MEDICINE</div>
+                <div style="font-size:13px;color:var(--dim);">REE contrast agents and MRI superconducting coil alloys
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div>
+            <div class="footer-brand">AUV Proposal<span>.</span></div>
+            <div style="font-family:var(--mono);font-size:10px;color:var(--dim);letter-spacing:2px;margin-top:8px;">
+                UNDERWATER RARE EARTH MINERAL PROSPECTING SYSTEM</div>
+        </div>
+        <div class="footer-info">
+            Student Research Initiative<br>
+            Prototype v0.1 — Shallow Water Demonstrator<br>
+            Incubator Proposal Document · 2025<br>
+            <span style="color:var(--teal);">Open to Collaboration & Funding</span>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scroll + nav highlight
+        const sections = document.querySelectorAll('section[id]');
+        const navLinks = document.querySelectorAll('.nav-links a');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navLinks.forEach(a => a.style.color = '');
+                    const active = document.querySelector(`.nav-links a[href="#${entry.target.id}"]`);
+                    if (active) active.style.color = 'var(--cyan)';
+                }
+            });
+        }, { threshold: 0.3 });
+
+        sections.forEach(s => observer.observe(s));
+
+        // Animate elements on scroll
+        const animItems = document.querySelectorAll('.concept-card, .sensor-card, .future-card, .team-card, .workflow-step');
+
+        const animObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry, i) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }, 60 * (entry.target.dataset.index || 0));
+                }
+            });
+        }, { threshold: 0.1 });
+
+        animItems.forEach((el, i) => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            el.dataset.index = i % 6;
+            animObserver.observe(el);
+        });
+    </script>
+
+</body>
+
+</html>
